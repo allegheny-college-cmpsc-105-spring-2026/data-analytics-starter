@@ -14,4 +14,4 @@ Check your GitHub Actions builds until your website URL is activated!
 
 TODO: Paste your URL into the following sheet.
 
-[All urls from your classmates' websites](https://docs.google.com/spreadsheets/d/1bVYuF_9NcIi0qet6Rn7sf6_3gjHtXL4ks6hcPrb1uYU/edit?usp=sharing)
+[All urls from your classmates' websites](https://docs.google.com/spreadsheets/d/1GN56_SIKfx-Zm2uy1NlohMkewvm0_7Xi/edit?usp=sharing&ouid=103917440767036558099&rtpof=true&sd=true)
