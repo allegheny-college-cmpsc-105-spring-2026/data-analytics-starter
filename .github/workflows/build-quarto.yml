@@ -2,53 +2,61 @@ name: Build and Deploy Quarto Site
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Create virtual environment & install dependencies
+      - name: Create virtual environment and install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install jupyter
-          pip install -r requirements.txt || true  # If you have additional Python dependencies
+          pip install -r requirements.txt || true
 
       - name: Setup Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      - name: Setup Pandoc (Quarto dependency)
+      - name: Setup Pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Render Quarto site with virtual environment
+      - name: Render Quarto site
         run: |
           source venv/bin/activate
           quarto render
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add docs/
-          git commit -m "Automated render of Quarto site" || exit 0
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
 
-      # - name: Commit and push changes
-      #   run: |
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "actions@github.com"
-      #     git add docs/
-      #     git commit -m "Automated render of Quarto site" || exit 0
-      #     git push
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
